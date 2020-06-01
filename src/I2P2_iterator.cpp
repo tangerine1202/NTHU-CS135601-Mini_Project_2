@@ -1,4 +1,5 @@
 #include "../header/I2P2_iterator.h"
+#include <iostream>
 
 namespace I2P2
 {
@@ -20,32 +21,136 @@ namespace I2P2
   reference vector_iterator::operator[](difference_type offset) const {};
 
   // list_iterator
+  // TODO: deal with nullptr problem ?
   list_iterator::list_iterator()
   {
-    p = nullptr;
+    this->p = nullptr;
   };
-  iterator_impl_base &list_iterator::operator++(){};
-  iterator_impl_base &list_iterator::operator--(){};
-  iterator_impl_base &list_iterator::operator+=(difference_type offset){};
-  iterator_impl_base &list_iterator::operator-=(difference_type offset){};
-  bool list_iterator::operator==(const iterator_impl_base &rhs) const {};
-  bool list_iterator::operator!=(const iterator_impl_base &rhs) const {};
-  bool list_iterator::operator<(const iterator_impl_base &rhs) const {};
-  bool list_iterator::operator>(const iterator_impl_base &rhs) const {};
-  bool list_iterator::operator<=(const iterator_impl_base &rhs) const {};
-  bool list_iterator::operator>=(const iterator_impl_base &rhs) const {};
-  difference_type list_iterator::operator-(const iterator_impl_base &rhs) const {};
-  pointer list_iterator::operator->() const {};
-  reference list_iterator::operator*() const {};
-  reference list_iterator::operator[](difference_type offset) const {};
+  iterator_impl_base &list_iterator::operator++()
+  {
+    this->p = this->p->next;
+    return *this;
+  };
+  iterator_impl_base &list_iterator::operator--()
+  {
+    this->p = this->p->prev;
+    return *this;
+  };
+  iterator_impl_base &list_iterator::operator+=(difference_type offset)
+  {
+    while (--offset)
+      ++*(this->p);
+    return *this;
+  };
+  iterator_impl_base &list_iterator::operator-=(difference_type offset)
+  {
+    while (--offset)
+      --*(this->p);
+    return *this;
+  };
+  bool list_iterator::operator==(const iterator_impl_base &rhs) const
+  {
+    return **this == *rhs;
+  };
+  bool list_iterator::operator!=(const iterator_impl_base &rhs) const
+  {
+    return **this != *rhs;
+  };
+  bool list_iterator::operator<(const iterator_impl_base &rhs) const
+  {
+    return **this < *rhs;
+  };
+  bool list_iterator::operator>(const iterator_impl_base &rhs) const
+  {
+    return **this > *rhs;
+  };
+  bool list_iterator::operator<=(const iterator_impl_base &rhs) const
+  {
+    return **this <= *rhs;
+  };
+  bool list_iterator::operator>=(const iterator_impl_base &rhs) const
+  {
+    return **this >= *rhs;
+  };
+  difference_type list_iterator::operator-(const iterator_impl_base &rhs) const
+  {
+    // FIXME: must I implenment ?
+    std::cout << "you called list_iterato::oeprator- which does implenment yet!\n";
+  };
+  pointer list_iterator::operator->() const
+  {
+    return &(this->operator*());
+  };
+  reference list_iterator::operator*() const
+  {
+    return this->p->val;
+  };
+  reference list_iterator::operator[](difference_type offset) const
+  {
+    // FIXME: must I implenment ?
+    std::cout << "you called list_iterato::oeprator[] which does implenment yet!\n";
+  };
 
   // const iterator
-  bool const_iterator::operator==(const const_iterator &rhs) const {};
-  bool const_iterator::operator!=(const const_iterator &rhs) const {};
-  bool const_iterator::operator<(const const_iterator &rhs) const {};
-  bool const_iterator::operator>(const const_iterator &rhs) const {};
-  bool const_iterator::operator<=(const const_iterator &rhs) const {};
-  bool const_iterator::operator>=(const const_iterator &rhs) const {};
+  const_iterator::~const_iterator()
+  {
+    delete this->p_;
+  };
+  const_iterator::const_iterator()
+  {
+    this->p_ = nullptr;
+  };
+  const_iterator::const_iterator(iterator_impl_base *p)
+  {
+    this->p_ = p;
+  };
+  const_iterator::const_iterator(const const_iterator &rhs)
+  {
+    this->p_ = rhs.p_;
+  };
+  const_iterator::pointer const_iterator::operator->() const
+  {
+    return &(**(this->p_));
+  };
+  const_iterator::reference const_iterator::operator*() const
+  {
+    return **(this->p_);
+  };
+  bool const_iterator::operator==(const const_iterator &rhs) const
+  {
+    return **this == *rhs;
+  };
+  bool const_iterator::operator!=(const const_iterator &rhs) const
+  {
+    return **this != *rhs;
+  };
+  bool const_iterator::operator<(const const_iterator &rhs) const
+  {
+    return **this < *rhs;
+  };
+  bool const_iterator::operator>(const const_iterator &rhs) const
+  {
+    return **this > *rhs;
+  };
+  bool const_iterator::operator<=(const const_iterator &rhs) const
+  {
+    return **this <= *rhs;
+  };
+  bool const_iterator::operator>=(const const_iterator &rhs) const
+  {
+    return **this >= *rhs;
+  };
+  // TODO: I think I don't need to implement these fn.
+  // const_iterator &const_iterator::operator++();
+  // const_iterator const_iterator::operator++(int);
+  // const_iterator &const_iterator::operator--();
+  // const_iterator const_iterator::operator--(int);
+  // const_iterator &const_iterator::operator+=(difference_type offset);
+  // const_iterator const_iterator::operator+(difference_type offset) const ;
+  // const_iterator &const_iterator::operator-=(difference_type offset);
+  // const_iterator const_iterator::operator-(difference_type offset) const {};
+  // difference_type const_iterator::operator-(const const_iterator &rhs) const {};
+  // reference const_iterator::operator[](difference_type offset) const ;
 
   // iterator
   iterator::iterator()
