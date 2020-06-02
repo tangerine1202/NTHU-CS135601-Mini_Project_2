@@ -5,6 +5,15 @@
 
 namespace I2P2
 {
+  // FIXME: weird definition position, but not here, intellisense can't find it
+  struct Node
+  {
+    value_type val;
+    Node *prev;
+    Node *next;
+    Node(value_type v = 0) : val(v), prev(nullptr), next(nullptr){};
+  };
+
   struct iterator_impl_base
   {
     virtual reference operator*() const = 0;
@@ -57,6 +66,8 @@ namespace I2P2
 
   public:
     list_iterator();
+    // (self added) add this function to proper construct list_iterator with Node data.
+    list_iterator(Node *p);
     iterator_impl_base &operator++();
     iterator_impl_base &operator--();
     iterator_impl_base &operator+=(difference_type offset);
