@@ -1,23 +1,37 @@
 #include "../header/I2P2_iterator.h"
 #include <iostream>
 
+/*
+### important
+[offset] may be negative number !!!
+*/
+
 namespace I2P2
 {
   // vector_iterator
+  /*
+  constructor , destructor clone: ref to 12727
+  see 11445
+  */
   vector_iterator::vector_iterator(){};
   iterator_impl_base &vector_iterator::operator++(){};
   iterator_impl_base &vector_iterator::operator--(){};
   iterator_impl_base &vector_iterator::operator+=(difference_type offset){};
   iterator_impl_base &vector_iterator::operator-=(difference_type offset){};
   bool vector_iterator::operator==(const iterator_impl_base &rhs) const {};
-  bool vector_iterator::operator!=(const iterator_impl_base &rhs) const {};
+  bool vector_iterator::operator!=(const iterator_impl_base &rhs) const {
+      // return ptr_to_data != rhs.ptr_to_data
+      // since it's ptr, we can check if they point to the same address.
+  };
   bool vector_iterator::operator<(const iterator_impl_base &rhs) const {};
   bool vector_iterator::operator>(const iterator_impl_base &rhs) const {};
   bool vector_iterator::operator<=(const iterator_impl_base &rhs) const {};
   bool vector_iterator::operator>=(const iterator_impl_base &rhs) const {};
   difference_type vector_iterator::operator-(const iterator_impl_base &rhs) const {};
   pointer vector_iterator::operator->() const {};
-  reference vector_iterator::operator*() const {};
+  reference vector_iterator::operator*() const {
+      // return *ptr_to_data;
+  };
   reference vector_iterator::operator[](difference_type offset) const {};
 
   // list_iterator
@@ -108,14 +122,6 @@ namespace I2P2
   {
     this->p_ = rhs.p_;
   };
-  const_iterator::pointer const_iterator::operator->() const
-  {
-    return &(**(this->p_));
-  };
-  const_iterator::reference const_iterator::operator*() const
-  {
-    return **(this->p_);
-  };
   bool const_iterator::operator==(const const_iterator &rhs) const
   {
     return **this == *rhs;
@@ -140,17 +146,70 @@ namespace I2P2
   {
     return **this >= *rhs;
   };
-  // TODO: I think I don't need to implement these fn.
-  // const_iterator &const_iterator::operator++();
-  // const_iterator const_iterator::operator++(int);
-  // const_iterator &const_iterator::operator--();
-  // const_iterator const_iterator::operator--(int);
-  // const_iterator &const_iterator::operator+=(difference_type offset);
-  // const_iterator const_iterator::operator+(difference_type offset) const ;
-  // const_iterator &const_iterator::operator-=(difference_type offset);
-  // const_iterator const_iterator::operator-(difference_type offset) const {};
-  // difference_type const_iterator::operator-(const const_iterator &rhs) const {};
-  // reference const_iterator::operator[](difference_type offset) const ;
+  const_iterator &const_iterator::operator++()
+  {
+    ++*(this->p_);
+    return *this;
+  };
+  const_iterator const_iterator::operator++(int)
+  {
+    const_iterator ret = *this;
+    ++*(this->p_);
+    return ret;
+  };
+  const_iterator &const_iterator::operator--()
+  {
+    --*(this->p_);
+    return *this;
+  };
+  const_iterator const_iterator::operator--(int)
+  {
+    const_iterator ret = *this;
+    --*(this->p_);
+    return ret;
+  };
+  const_iterator &const_iterator::operator+=(difference_type offset)
+  {
+    while (offset--)
+      ++*this;
+    return *this;
+  };
+  const_iterator const_iterator::operator+(difference_type offset) const
+  {
+    const_iterator ret = *this;
+    while (offset--)
+      ++ret;
+    return ret;
+  };
+  const_iterator &const_iterator::operator-=(difference_type offset)
+  {
+    while (offset--)
+      --*this;
+    return *this;
+  };
+  const_iterator const_iterator::operator-(difference_type offset) const
+  {
+    const_iterator ret = *this;
+    while (offset--)
+      --ret;
+    return ret;
+  };
+  difference_type const_iterator::operator-(const const_iterator &rhs) const
+  {
+    return *(this->p_) - *(rhs.p_);
+  };
+  const_iterator::pointer const_iterator::operator->() const
+  {
+    return &(**(this->p_));
+  };
+  const_iterator::reference const_iterator::operator*() const
+  {
+    return **(this->p_);
+  };
+  const_iterator::reference const_iterator::operator[](difference_type offset) const
+  {
+    return (*(this->p_))[offset];
+  };
 
   // iterator
   iterator::iterator()
@@ -172,9 +231,9 @@ namespace I2P2
   };
   iterator iterator::operator++(int)
   {
-    iterator *ret = new iterator(*this);
+    iterator ret = *this;
     ++*(this->p_);
-    return *ret;
+    return ret;
   };
   iterator &iterator::operator--()
   {
@@ -183,47 +242,51 @@ namespace I2P2
   };
   iterator iterator::operator--(int)
   {
-    iterator *ret = new iterator(*this);
+    iterator ret = *this;
     --*(this->p_);
-    return *this;
+    return ret;
   };
   iterator &iterator::operator+=(difference_type offset)
   {
-    *(this->p_) += offset;
+    while (offset--)
+      ++*this;
     return *this;
   };
   iterator iterator::operator+(difference_type offset) const
   {
-    iterator *ret = new iterator(*this);
-    *(ret->p_) += offset;
-    return *ret;
+    iterator ret = *this;
+    while (offset--)
+      ++ret;
+    return ret;
   };
   iterator &iterator::operator-=(difference_type offset)
   {
-    *(this->p_) -= offset;
+    while (offset--)
+      --*this;
     return *this;
   };
   iterator iterator::operator-(difference_type offset) const
   {
-    iterator *ret = new iterator(*this);
-    *(ret->p_) -= offset;
-    return *ret;
+    iterator ret = *this;
+    while (offset--)
+      --ret;
+    return ret;
   };
   difference_type iterator::operator-(const iterator &rhs) const
   {
-    return *(this->p_) - *rhs.p_;
+    return *(this->p_) - *(rhs.p_);
   };
-  pointer iterator::operator->() const
+  iterator::pointer iterator::operator->() const
   {
-    return &(this->operator*());
+    return &(**(this->p_));
   };
-  reference iterator::operator*() const
+  iterator::reference iterator::operator*() const
   {
-    return *(*(this->p_));
+    return **(this->p_);
   };
-  reference iterator::operator[](difference_type offset) const
+  iterator::reference iterator::operator[](difference_type offset) const
   {
-    return *(*this + offset);
+    return (*(this->p_))[offset];
   };
 
   /* Your definition for the iterator class goes here */
