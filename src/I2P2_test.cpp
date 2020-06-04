@@ -798,6 +798,10 @@ namespace I2P2_test
     for (unsigned long i(0); i != op_test_cnt; ++i)
     {
       const auto select(which(mt));
+      // auto md = mode(mt);
+      // auto md = 26;
+      // std::cout << "mode: " << md << '\n';
+      // switch (md)
       switch (mode(mt))
       {
       case 0:

@@ -9,7 +9,8 @@ namespace I2P2
   {
   private:
     // you may want to declare the necessary members for your Vector here
-
+    pointer _begin, _end;
+    pointer _last;
     /* The following are standard methods from the STL
    * If you are not sure what they do
    * look them up and implement your own version */

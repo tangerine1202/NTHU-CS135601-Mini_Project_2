@@ -10,44 +10,93 @@ namespace I2P2
   constructor , destructor clone: ref to 12727
   see 11445
   */
-  vector_iterator::vector_iterator(){};
-  iterator_impl_base &vector_iterator::operator++(){};
-  iterator_impl_base &vector_iterator::operator--(){};
-  iterator_impl_base &vector_iterator::operator+=(difference_type offset){};
-  iterator_impl_base &vector_iterator::operator-=(difference_type offset){};
-  bool vector_iterator::operator==(const iterator_impl_base &rhs) const {};
-  bool vector_iterator::operator!=(const iterator_impl_base &rhs) const {
-      // return ptr_to_data != rhs.ptr_to_data
-      // since it's ptr, we can check if they point to the same address.
+  vector_iterator::vector_iterator(pointer p) : p(p){};
+  iterator_impl_base *vector_iterator::clone() const
+  {
+    vector_iterator *ret = new vector_iterator(this->p);
+    return ret;
+  }
+  vector_iterator::vector_iterator()
+  {
+    this->p = nullptr;
   };
-  bool vector_iterator::operator<(const iterator_impl_base &rhs) const {};
-  bool vector_iterator::operator>(const iterator_impl_base &rhs) const {};
-  bool vector_iterator::operator<=(const iterator_impl_base &rhs) const {};
-  bool vector_iterator::operator>=(const iterator_impl_base &rhs) const {};
-  difference_type vector_iterator::operator-(const iterator_impl_base &rhs) const {};
-  pointer vector_iterator::operator->() const {};
-  reference vector_iterator::operator*() const {
-      // return *ptr_to_data;
+  iterator_impl_base &vector_iterator::operator++()
+  {
+    this->p += 1;
+    return *this;
   };
-  reference vector_iterator::operator[](difference_type offset) const {};
+  iterator_impl_base &vector_iterator::operator--()
+  {
+    this->p -= 1;
+    return *this;
+  };
+  iterator_impl_base &vector_iterator::operator+=(difference_type offset)
+  {
+    this->p += offset;
+    return *this;
+  };
+  iterator_impl_base &vector_iterator::operator-=(difference_type offset)
+  {
+    this->p -= offset;
+    return *this;
+  };
+  bool vector_iterator::operator==(const iterator_impl_base &rhs) const
+  {
+    return this->p == dynamic_cast<const vector_iterator &>(rhs).p;
+  };
+  bool vector_iterator::operator!=(const iterator_impl_base &rhs) const
+  {
+    return !(*this == rhs);
+  };
+  bool vector_iterator::operator<(const iterator_impl_base &rhs) const
+  {
+    return this->p < dynamic_cast<const vector_iterator &>(rhs).p;
+  };
+  bool vector_iterator::operator>(const iterator_impl_base &rhs) const
+  {
+    if (*this == rhs)
+      return false;
+    return !(*this < rhs);
+  };
+  bool vector_iterator::operator<=(const iterator_impl_base &rhs) const
+  {
+    return !(*this > rhs);
+  };
+  bool vector_iterator::operator>=(const iterator_impl_base &rhs) const
+  {
+    return !(*this < rhs);
+  };
+  difference_type vector_iterator::operator-(const iterator_impl_base &rhs) const
+  {
+    // TODO: check if unis is different.
+    return (dynamic_cast<const vector_iterator &>(rhs).p - this->p);
+  };
+  pointer vector_iterator::operator->() const
+  {
+    return (*this).p;
+  };
+  reference vector_iterator::operator*() const
+  {
+    return *(this->p);
+  };
+  reference vector_iterator::operator[](difference_type offset) const
+  {
+    return *(this->p + offset);
+  };
 
   // list_iterator
-  // TODO: deal with nullptr problem ?
+  list_iterator::list_iterator(Node *p)
+  {
+    this->p = p;
+  }
+  iterator_impl_base *list_iterator::clone() const
+  {
+    return new list_iterator(this->p);
+  }
   list_iterator::list_iterator()
   {
     this->p = nullptr;
   };
-  // (self added) add this function to proper construct list_iterator with Node data.
-  list_iterator::list_iterator(Node *p)
-  {
-    if (DEBUG_LOG)
-      std::cout << "[str] list_iterator(Node*)\n";
-
-    this->p = p;
-
-    if (DEBUG_LOG)
-      std::cout << "[end] list_iterator(Node*)\n";
-  }
   iterator_impl_base &list_iterator::operator++()
   {
     this->p = this->p->next;
@@ -60,13 +109,13 @@ namespace I2P2
   };
   iterator_impl_base &list_iterator::operator+=(difference_type offset)
   {
-    while (--offset)
+    while (offset--)
       ++*this;
     return *this;
   };
   iterator_impl_base &list_iterator::operator-=(difference_type offset)
   {
-    while (--offset)
+    while (offset--)
       --*this;
     return *this;
   };
@@ -82,6 +131,9 @@ namespace I2P2
   {
     Node *cur_node = this->p;
     Node *rhs_node = dynamic_cast<const list_iterator &>(rhs).p;
+    // special case: if lhs == rhs
+    if (cur_node == rhs_node)
+      return false;
     while (cur_node != nullptr)
     {
       if (cur_node == rhs_node)
@@ -98,29 +150,25 @@ namespace I2P2
   };
   bool list_iterator::operator<=(const iterator_impl_base &rhs) const
   {
-    if (*this == rhs)
-      return true;
-    return *this < rhs;
+    return !(*this > rhs);
   };
   bool list_iterator::operator>=(const iterator_impl_base &rhs) const
   {
-    if (*this == rhs)
-      return true;
-    return *this > rhs;
+    return !(*this < rhs);
   };
   difference_type list_iterator::operator-(const iterator_impl_base &rhs) const
   {
     difference_type cnt = 0;
     Node *cur_node = this->p;
     Node *rhs_node = dynamic_cast<const list_iterator &>(rhs).p;
-    if (*this >= rhs)
+    if (*this < rhs)
     {
       while (cur_node != nullptr)
       {
         if (cur_node == rhs_node)
           break;
         cur_node = cur_node->next;
-        cnt++;
+        cnt--;
       }
     }
     else
@@ -130,7 +178,7 @@ namespace I2P2
         if (cur_node == rhs_node)
           break;
         cur_node = cur_node->prev;
-        cnt--;
+        cnt++;
       }
     }
     return cnt;
@@ -149,7 +197,7 @@ namespace I2P2
     if (offset >= 0)
       (*ret) += offset;
     else
-      (*ret) -= offset;
+      (*ret) -= -offset;
     return **ret;
   };
 
@@ -164,11 +212,11 @@ namespace I2P2
   };
   const_iterator::const_iterator(iterator_impl_base *p)
   {
-    this->p_ = p;
+    this->p_ = p->clone();
   };
   const_iterator::const_iterator(const const_iterator &rhs)
   {
-    this->p_ = rhs.p_;
+    this->p_ = rhs.p_->clone();
   };
   const_iterator &const_iterator::operator=(const const_iterator &rhs)
   {
@@ -258,11 +306,11 @@ namespace I2P2
   };
   bool const_iterator::operator<=(const const_iterator &rhs) const
   {
-    return *(this->p_) <= (*rhs.p_);
+    return *(this->p_) <= *(rhs.p_);
   };
   bool const_iterator::operator>=(const const_iterator &rhs) const
   {
-    return *(this->p_) >= (*rhs.p_);
+    return *(this->p_) >= *(rhs.p_);
   };
 
   // iterator
@@ -272,11 +320,11 @@ namespace I2P2
   };
   iterator::iterator(iterator_impl_base *p)
   {
-    this->p_ = p;
+    this->p_ = p->clone();
   };
   iterator::iterator(const iterator &rhs)
   {
-    this->p_ = rhs.p_;
+    this->p_ = rhs.p_->clone();
   };
   iterator &iterator::operator++()
   {
@@ -303,7 +351,9 @@ namespace I2P2
   iterator &iterator::operator+=(difference_type offset)
   {
     while (offset--)
+    {
       ++*this;
+    }
     return *this;
   };
   iterator iterator::operator+(difference_type offset) const

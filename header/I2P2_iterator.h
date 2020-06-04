@@ -16,6 +16,7 @@ namespace I2P2
 
   struct iterator_impl_base
   {
+    virtual iterator_impl_base *clone() const = 0;
     virtual reference operator*() const = 0;
     virtual reference operator[](difference_type offset) const = 0;
     virtual pointer operator->() const = 0;
@@ -39,8 +40,12 @@ namespace I2P2
   {
   protected:
     // You may want to declare what your vector_iterator stores here
+    pointer p;
 
   public:
+    // (self added)
+    vector_iterator(pointer p);
+    iterator_impl_base *clone() const;
     vector_iterator();
     iterator_impl_base &operator++();
     iterator_impl_base &operator--();
@@ -65,9 +70,10 @@ namespace I2P2
     Node *p;
 
   public:
-    list_iterator();
     // (self added) add this function to proper construct list_iterator with Node data.
     list_iterator(Node *p);
+    iterator_impl_base *clone() const;
+    list_iterator();
     iterator_impl_base &operator++();
     iterator_impl_base &operator--();
     iterator_impl_base &operator+=(difference_type offset);

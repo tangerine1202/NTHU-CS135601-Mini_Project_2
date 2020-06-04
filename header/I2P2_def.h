@@ -1,6 +1,7 @@
 #ifndef I2P2_DEF_H
 #define I2P2_DEF_H
 #include <cstdint>
+#include <cstddef>
 
 namespace I2P2
 {
