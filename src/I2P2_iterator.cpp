@@ -69,7 +69,6 @@ namespace I2P2
   };
   difference_type vector_iterator::operator-(const iterator_impl_base &rhs) const
   {
-    // TODO: check if unis is different.
     return (this->p - dynamic_cast<const vector_iterator &>(rhs).p);
   };
   pointer vector_iterator::operator->() const
