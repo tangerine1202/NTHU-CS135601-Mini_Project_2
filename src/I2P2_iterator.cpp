@@ -270,24 +270,24 @@ namespace I2P2
   };
   const_iterator &const_iterator::operator+=(difference_type offset)
   {
-    *this += offset;
+    *(this->p_) += offset;
     return *this;
   };
   const_iterator const_iterator::operator+(difference_type offset) const
   {
     const_iterator ret = *this;
-    ret += offset;
+    *(ret.p_) += offset;
     return ret;
   };
   const_iterator &const_iterator::operator-=(difference_type offset)
   {
-    *this -= offset;
+    *(this->p_) -= offset;
     return *this;
   };
   const_iterator const_iterator::operator-(difference_type offset) const
   {
     const_iterator ret = *this;
-    ret -= offset;
+    *(ret.p_) -= offset;
     return ret;
   };
   difference_type const_iterator::operator-(const const_iterator &rhs) const
@@ -368,24 +368,24 @@ namespace I2P2
   };
   iterator &iterator::operator+=(difference_type offset)
   {
-    *this += offset;
+    *(this->p_) += offset;
     return *this;
   };
   iterator iterator::operator+(difference_type offset) const
   {
     iterator ret = *this;
-    ret += offset;
+    *(ret.p_) += offset;
     return ret;
   };
   iterator &iterator::operator-=(difference_type offset)
   {
-    *this -= offset;
+    *(this->p_) -= offset;
     return *this;
   };
   iterator iterator::operator-(difference_type offset) const
   {
     iterator ret = *this;
-    ret -= offset;
+    *(ret.p_) -= offset;
     return ret;
   };
   difference_type iterator::operator-(const iterator &rhs) const
