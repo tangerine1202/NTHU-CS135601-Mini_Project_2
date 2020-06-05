@@ -1,6 +1,5 @@
 #include "../header/I2P2_iterator.h"
-#include <iostream>
-#define DEBUG_LOG true
+// #include <iostream>
 
 namespace I2P2
 {
@@ -10,11 +9,13 @@ namespace I2P2
   constructor , destructor clone: ref to 12727
   see 11445
   */
-  vector_iterator::vector_iterator(pointer p) : p(p){};
+  vector_iterator::vector_iterator(pointer p)
+  {
+    this->p = p;
+  };
   iterator_impl_base *vector_iterator::clone() const
   {
-    vector_iterator *ret = new vector_iterator(this->p);
-    return ret;
+    return new vector_iterator(this->p);
   }
   vector_iterator::vector_iterator()
   {
@@ -69,7 +70,7 @@ namespace I2P2
   difference_type vector_iterator::operator-(const iterator_impl_base &rhs) const
   {
     // TODO: check if unis is different.
-    return (dynamic_cast<const vector_iterator &>(rhs).p - this->p);
+    return (this->p - dynamic_cast<const vector_iterator &>(rhs).p);
   };
   pointer vector_iterator::operator->() const
   {
@@ -81,7 +82,7 @@ namespace I2P2
   };
   reference vector_iterator::operator[](difference_type offset) const
   {
-    return *(this->p + offset);
+    return *(this->p + offset); // need to use -= ?
   };
 
   // list_iterator

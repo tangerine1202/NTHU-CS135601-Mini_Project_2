@@ -436,6 +436,7 @@ namespace I2P2_test
         assert(false);
       }
     }
+
     template <class T, class Std>
     void insert_(T &c, Std &s, std::size_t, std::size_t count, std::false_type) const
     {
@@ -797,11 +798,9 @@ namespace I2P2_test
     std::uniform_int_distribution<> which(0, 1);
     for (unsigned long i(0); i != op_test_cnt; ++i)
     {
+      if (!(i % (op_test_cnt >> 4)))
+        std::cout << "list round: " << i / (op_test_cnt >> 4) << '\n';
       const auto select(which(mt));
-      // auto md = mode(mt);
-      // auto md = 26;
-      // std::cout << "mode: " << md << '\n';
-      // switch (md)
       switch (mode(mt))
       {
       case 0:
@@ -913,6 +912,8 @@ namespace I2P2_test
     std::uniform_int_distribution<> which(0, 1);
     for (unsigned long i(0); i != op_test_cnt; ++i)
     {
+      if (!(i % (op_test_cnt >> 4)))
+        std::cout << "vector round: " << i / (op_test_cnt >> 4) << '\n';
       const auto select(which(mt));
       switch (mode(mt))
       {

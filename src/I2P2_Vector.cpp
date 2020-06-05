@@ -1,11 +1,18 @@
 #include "../header/I2P2_Vector.h"
+#include <iostream>
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 namespace I2P2
 {
+
+  value_type *get_valptr_from_val_ptr(const value_type *val_ptr)
+  {
+    return const_cast<value_type *>(val_ptr);
+  }
+
   Vector::~Vector()
   {
-    delete[] _begin;
-    this->_begin = this->_end = this->_last = nullptr;
+    delete[] this->_begin;
   };
   Vector::Vector()
   {
@@ -22,22 +29,27 @@ namespace I2P2
     this->~Vector();
     // reconstruct
     new (this) Vector(rhs);
+    return *this;
   };
   iterator Vector::begin()
   {
-    return iterator(vector_iterator(this->_begin).clone());
+    vector_iterator ret_vector_iter = vector_iterator(this->_begin);
+    return iterator(&ret_vector_iter);
   };
   const_iterator Vector::begin() const
   {
-    return iterator(vector_iterator(this->_begin).clone());
+    vector_iterator ret_vector_iter = vector_iterator(this->_begin);
+    return iterator(&ret_vector_iter);
   };
   iterator Vector::end()
   {
-    return --iterator(vector_iterator(this->_last).clone());
+    vector_iterator ret_vector_iter = vector_iterator(this->_last);
+    return iterator(&ret_vector_iter);
   };
   const_iterator Vector::end() const
   {
-    return --iterator(vector_iterator(this->_last).clone());
+    vector_iterator ret_vector_iter = vector_iterator(this->_last);
+    return iterator(&ret_vector_iter);
   };
   reference Vector::front()
   {
@@ -81,27 +93,102 @@ namespace I2P2
   };
   void Vector::erase(const_iterator pos)
   {
-    const_iterator last_iter = this->end();
-    for (const_iterator i = pos; i != last_iter; ++i)
+    // if (!this->empty())
+    // {
+    //   pointer pos_ptr = const_cast<pointer>(&*pos);
+    //   // move behind
+    //   for (; pos_ptr < this->_last; ++pos_ptr)
+    //   {
+    //     if (pos_ptr != (this->_last - 1))
+    //       *pos_ptr = *(pos_ptr + 1);
+    //   }
+    //   // delete the last node
+    //   --this->_last;
+    // }
+    this->erase(pos, pos + 1);
+  };
+  void Vector::erase(const_iterator begin, const_iterator end)
+  {
+    if (!this->empty())
     {
-      break;
+      size_type diff = end - begin;
+      pointer source_ptr = const_cast<pointer>(&*end);
+      pointer target_ptr = const_cast<pointer>(&*begin);
+      // move behind
+      for (; source_ptr < this->_last; ++source_ptr, ++target_ptr)
+      {
+        // if (pos_ptr != (this->_last - 1))
+        //   *pos_ptr = *(pos_ptr + 1);
+        *target_ptr = *source_ptr;
+      }
+      // delete the last node
+      this->_last -= diff;
     }
   };
-  void Vector::erase(const_iterator begin, const_iterator end){};
-  void Vector::insert(const_iterator pos, size_type count, const_reference val){};
-  void Vector::insert(const_iterator pos, const_iterator begin, const_iterator end){};
+  void Vector::insert(const_iterator pos, size_type count, const_reference val)
+  {
+    size_type sz = this->size();
+    size_type cp = this->capacity();
+    size_type pos_diff = pos - this->begin();
+    pointer pos_ptr;
+    // reserve if needed
+    while (sz + count > cp)
+    {
+      this->reserve(max(cp + 1, cp * 3));
+      cp = this->capacity();
+    }
+    // Don't get pos_ptr from pos, since reserve may delete origine vector storage
+    pos_ptr = this->_begin + pos_diff;
+    // move old data
+    for (pointer ptr = this->_last + count - 1; pos_ptr + count - 1 < ptr; --ptr)
+      *(ptr) = *(ptr - count);
+    // insert new data
+    for (size_type i = 0; i < count; ++i)
+      *(pos_ptr + i) = val;
+    // move _last
+    this->_last += count;
+  };
+  void Vector::insert(const_iterator pos, const_iterator begin, const_iterator end)
+  {
+    size_type sz = this->size();
+    size_type cp = this->capacity();
+    size_type count = end - begin;
+    size_type pos_diff = pos - this->begin();
+    pointer pos_ptr;
+    // reserve if needed
+    while (sz + count > cp)
+    {
+      // max(cp+1, cp*3) may not enough
+      this->reserve(max(cp + 1, cp * 3));
+      cp = this->capacity();
+    }
+    // Don't get pos_ptr from pos, since reserve may delete origine vector storage
+    pos_ptr = this->_begin + pos_diff;
+    // move old data
+    for (pointer ptr = (this->_last + count - 1); (pos_ptr + count - 1) < ptr; --ptr)
+      *(ptr) = *(ptr - count);
+    // insert new data
+    for (size_type i = 0; i < count; ++i)
+      *(pos_ptr + i) = *(begin + i);
+    // move _last
+    this->_last += count;
+  };
   void Vector::pop_back()
   {
-    /* 
-      http://www.cplusplus.com/reference/vector/vector/pop_back/
-      If the container is not empty, the function never throws exceptions (no-throw guarantee).
-      Otherwise, it causes undefined behavior.
-      */
-    this->_last -= 1;
+    this->erase(this->end() - 1);
   };
-  void Vector::pop_front(){};
-  void Vector::push_back(const_reference val){};
-  void Vector::push_front(const_reference val){};
+  void Vector::pop_front()
+  {
+    this->erase(this->begin());
+  };
+  void Vector::push_back(const_reference val)
+  {
+    this->insert(this->end(), 1, val);
+  };
+  void Vector::push_front(const_reference val)
+  {
+    this->insert(this->begin(), 1, val);
+  };
   void Vector::reserve(size_type new_capacity)
   {
     if (new_capacity > this->capacity())
@@ -111,7 +198,6 @@ namespace I2P2
       for (size_type i = 0; i < old_size; ++i)
       {
         storage[i] = this->_begin[i];
-        // new (storage + i) value_type(this->_begin[i]);
       }
       // delete old storage
       this->~Vector();
@@ -130,7 +216,6 @@ namespace I2P2
       for (size_type i = 0; i < old_size; ++i)
       {
         storage[i] = this->_begin[i];
-        // new (storage + i) value_type(this->_begin[i]);
       }
       // delete old storage
       this->~Vector();

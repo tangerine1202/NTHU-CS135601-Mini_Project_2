@@ -1,6 +1,5 @@
 #include "../header/I2P2_List.h"
-#include <iostream>
-#define DEBUG_LOG true
+// #include <iostream>
 
 namespace I2P2
 {
@@ -44,6 +43,7 @@ namespace I2P2
     this->~List();
     // reconstruct (using placement new)
     new (this) List(rhs);
+    return *this;
   };
   // begin
   iterator List::begin()
@@ -125,14 +125,12 @@ namespace I2P2
   };
   void List::erase(const_iterator begin, const_iterator end)
   {
-    // begin pos may larger than end !
-    if (begin > end)
-      std::swap(begin, end);
-
     while (begin != end)
-    {
+      // use postfix increment,
+      // since if you erase the begin first,
+      // you can't get begin->next.
       this->erase(begin++);
-    }
+
     // erase(const_iterator) handle size,
     // this fn don't need to do it.
   };
@@ -166,6 +164,7 @@ namespace I2P2
   };
   void List::insert(const_iterator pos, const_iterator begin, const_iterator end)
   {
+    // TODO: pos between begin and end
     for (; begin != end; ++begin)
       this->insert(pos, 1, *begin);
     // insert(const_iterator , size_type , const_reference )
@@ -189,7 +188,7 @@ namespace I2P2
   // push
   void List::push_back(const_reference val)
   {
-    this->insert((this->end()), 1, val);
+    this->insert(this->end(), 1, val);
     // insert(const_iterator , size_type , const_reference )
     // handle size, this fn don't need to do it.
   };
