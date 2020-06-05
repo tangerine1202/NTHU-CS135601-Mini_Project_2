@@ -5,7 +5,6 @@
 
 namespace I2P2
 {
-  // FIXME: weird definition position, but not here, intellisense can't find it
   struct Node
   {
     value_type val;
