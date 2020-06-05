@@ -47,6 +47,8 @@ namespace I2P2
   };
   bool vector_iterator::operator!=(const iterator_impl_base &rhs) const
   {
+    // This function can accelerate by direct call compare operator on this->p
+    // but it reduce the maintainablitiy. Hence, I choose not to do it.
     return !(*this == rhs);
   };
   bool vector_iterator::operator<(const iterator_impl_base &rhs) const
@@ -55,16 +57,22 @@ namespace I2P2
   };
   bool vector_iterator::operator>(const iterator_impl_base &rhs) const
   {
+    // This function can accelerate by direct call compare operator on this->p
+    // but it reduce the maintainablitiy. Hence, I choose not to do it.
     if (*this == rhs)
       return false;
     return !(*this < rhs);
   };
   bool vector_iterator::operator<=(const iterator_impl_base &rhs) const
   {
+    // This function can accelerate by direct call compare operator on this->p
+    // but it reduce the maintainablitiy. Hence, I choose not to do it.
     return !(*this > rhs);
   };
   bool vector_iterator::operator>=(const iterator_impl_base &rhs) const
   {
+    // This function can accelerate by direct call compare operator on this->p
+    // but it reduce the maintainablitiy. Hence, I choose not to do it.
     return !(*this < rhs);
   };
   difference_type vector_iterator::operator-(const iterator_impl_base &rhs) const
@@ -81,7 +89,7 @@ namespace I2P2
   };
   reference vector_iterator::operator[](difference_type offset) const
   {
-    return *(this->p + offset); // need to use -= ?
+    return *(this->p + offset);
   };
 
   // list_iterator
@@ -131,15 +139,18 @@ namespace I2P2
   {
     Node *cur_node = this->p;
     Node *rhs_node = dynamic_cast<const list_iterator &>(rhs).p;
+
     // special case: if lhs == rhs
     if (cur_node == rhs_node)
       return false;
+
     while (cur_node != nullptr)
     {
       if (cur_node == rhs_node)
         return true;
       cur_node = cur_node->next;
     }
+
     return false;
   };
   bool list_iterator::operator>(const iterator_impl_base &rhs) const
@@ -161,27 +172,38 @@ namespace I2P2
     difference_type cnt = 0;
     Node *cur_node = this->p;
     Node *rhs_node = dynamic_cast<const list_iterator &>(rhs).p;
-    if (*this < rhs)
+    bool found = false;
+
+    while (cur_node != nullptr)
     {
-      while (cur_node != nullptr)
+      if (cur_node == rhs_node)
       {
-        if (cur_node == rhs_node)
-          break;
-        cur_node = cur_node->next;
-        cnt--;
+        found = true;
+        break;
       }
+      cur_node = cur_node->next;
+      cnt--;
     }
-    else
+    if (found)
+      return cnt;
+
+    // reset var
+    cnt = 0;
+    cur_node = this->p;
+    while (cur_node != nullptr)
     {
-      while (cur_node != nullptr)
+      if (cur_node == rhs_node)
       {
-        if (cur_node == rhs_node)
-          break;
-        cur_node = cur_node->prev;
-        cnt++;
+        found = true;
+        break;
       }
+      cur_node = cur_node->prev;
+      cnt++;
     }
-    return cnt;
+    if (found)
+      return cnt;
+
+    throw "`rhs` is not in this List!\n";
   };
   pointer list_iterator::operator->() const
   {
@@ -248,28 +270,24 @@ namespace I2P2
   };
   const_iterator &const_iterator::operator+=(difference_type offset)
   {
-    while (offset--)
-      ++*this;
+    *this += offset;
     return *this;
   };
   const_iterator const_iterator::operator+(difference_type offset) const
   {
     const_iterator ret = *this;
-    while (offset--)
-      ++ret;
+    ret += offset;
     return ret;
   };
   const_iterator &const_iterator::operator-=(difference_type offset)
   {
-    while (offset--)
-      --*this;
+    *this -= offset;
     return *this;
   };
   const_iterator const_iterator::operator-(difference_type offset) const
   {
     const_iterator ret = *this;
-    while (offset--)
-      --ret;
+    ret -= offset;
     return ret;
   };
   difference_type const_iterator::operator-(const const_iterator &rhs) const
@@ -350,30 +368,24 @@ namespace I2P2
   };
   iterator &iterator::operator+=(difference_type offset)
   {
-    while (offset--)
-    {
-      ++*this;
-    }
+    *this += offset;
     return *this;
   };
   iterator iterator::operator+(difference_type offset) const
   {
     iterator ret = *this;
-    while (offset--)
-      ++ret;
+    ret += offset;
     return ret;
   };
   iterator &iterator::operator-=(difference_type offset)
   {
-    while (offset--)
-      --*this;
+    *this -= offset;
     return *this;
   };
   iterator iterator::operator-(difference_type offset) const
   {
     iterator ret = *this;
-    while (offset--)
-      --ret;
+    ret -= offset;
     return ret;
   };
   difference_type iterator::operator-(const iterator &rhs) const
