@@ -1,16 +1,26 @@
 #include "../header/I2P2_List.h"
-// #include <iostream>
+#include <iostream>
 
 namespace I2P2
 {
 
-  Node *get_node_from_val_ptr(const value_type *val_ptr)
+  inline Node *get_node_from_val_ptr(const value_type *val_ptr)
   {
     Node *ret;
     size_t offset = offsetof(Node, val);
     ret = reinterpret_cast<Node *>(reinterpret_cast<size_type>(val_ptr) - offset);
     return ret;
   }
+
+  inline void insert_node_list_into_list(Node *pos_node, Node *copy_head, Node *copy_last)
+  {
+    copy_head->prev = pos_node->prev;
+    copy_last->next = pos_node;
+    if (pos_node->prev != nullptr)
+      pos_node->prev->next = copy_head;
+    pos_node->prev = copy_last;
+  }
+
   // destructor
   List::~List()
   {
@@ -106,69 +116,104 @@ namespace I2P2
   // erase
   void List::erase(const_iterator pos)
   {
-    if (!this->empty())
-    {
-      Node *cur_node = get_node_from_val_ptr(&*pos);
-      // move prev, next node ptr
-      if (cur_node->prev != nullptr)
-        cur_node->prev->next = cur_node->next;
-      if (cur_node->next != nullptr)
-        cur_node->next->prev = cur_node->prev;
-      // check if it's _head (it won't be _tail, since _tail is the dummy node)
-      if (cur_node == this->_head)
-        this->_head = this->_head->next;
-      // delete node
-      delete cur_node;
-      // decrease size
-      this->_size--;
-    }
+    this->erase(pos, pos + 1);
   };
   void List::erase(const_iterator begin, const_iterator end)
   {
-    while (begin != end)
-      // use postfix increment,
-      // since if you erase the begin first,
-      // you can't get begin->next.
-      this->erase(begin++);
+    // if begin == end, erase nothing
+    if (begin == end)
+      return;
+    if (!this->empty())
+    {
+      Node *tmp;
+      Node *begin_node = get_node_from_val_ptr(&*begin);
+      Node *end_node = get_node_from_val_ptr(&*end);
+      // `last_node` is the last exist element, not dummy node
+      Node *last_node = end_node->prev;
 
-    // erase(const_iterator) handle size,
-    // this fn don't need to do it.
+      // move prev, next node ptr
+      if (begin_node->prev != nullptr)
+        begin_node->prev->next = last_node->next;
+      if (last_node->next != nullptr)
+        last_node->next->prev = begin_node->prev;
+      // check if it's _head (it won't be _tail, since _tail is the dummy node)
+      if (begin_node == this->_head)
+        this->_head = end_node;
+      // delete node
+      while (begin_node != end_node)
+      {
+        tmp = begin_node;
+        begin_node = begin_node->next;
+        delete tmp;
+        // decrease size
+        --this->_size;
+      }
+    }
   };
   // insert
   void List::insert(const_iterator pos, size_type count, const_reference val)
   {
-    Node *cur_node = get_node_from_val_ptr(&*pos);
-    Node *new_node;
-    bool pos_is_head = (cur_node == this->_head);
-    bool pos_is_tail = (cur_node == this->_tail);
-    for (size_type i = 0; i < count; i++)
+    // insert_size must larger than 0, otherwise, copy_list would broken
+    if (count == 0)
+      return;
+
+    Node *pos_node = get_node_from_val_ptr(&*pos);
+    Node *copy_head, *copy_last;
+    Node *tmp_node;
+    bool pos_is_head = (pos == this->begin());
+
+    // construct copy_list
+    copy_head = copy_last = new Node(val);
+    for (size_type i = 1; i < count; ++i)
     {
-      new_node = new Node(val);
-      // update pos_is_head state
-      // set new_node
-      new_node->next = cur_node;
-      new_node->prev = cur_node->prev;
-      // set cur_node and cur_node->prev
-      if (!pos_is_head)
-        cur_node->prev->next = new_node;
-      cur_node->prev = new_node;
-      // update this->_head
-      if (pos_is_head)
-      {
-        this->_head = new_node;
-        pos_is_head = false;
-      }
-      // increase size
-      this->_size++;
+      tmp_node = new Node(val);
+      copy_last->next = tmp_node;
+      tmp_node->prev = copy_last;
+      copy_last = tmp_node;
     }
+    // insert copy list back to list
+    insert_node_list_into_list(pos_node, copy_head, copy_last);
+    // update this->_head
+    if (pos_is_head)
+      this->_head = copy_head;
+    // increase size
+    this->_size += count;
   };
   void List::insert(const_iterator pos, const_iterator begin, const_iterator end)
   {
-    // TODO: pos between begin and end
-    for (; begin != end; ++begin)
-      this->insert(pos, 1, *begin);
-    // insert(const_iterator , size_type , const_reference )
-    // handle size, this fn don't need to do it.
+    // insert_size must larger than 0, otherwise, copy_list would broken
+    if (begin == end)
+      return;
+
+    // construct a copy node list [begin, end)
+    Node *pos_node = get_node_from_val_ptr(&*pos);
+    // can't use Node ptr to iterate begin to end,
+    // since begin, end may not be list_iterator (it may be verctor iterator)
+    const_iterator cur_iter(begin);
+    const_iterator end_iter(end);
+    Node *copy_head, *copy_last;
+    Node *tmp_node;
+    bool pos_is_head = (pos == this->begin());
+
+    // consturct copy_list
+    copy_head = copy_last = new Node(*cur_iter);
+    ++cur_iter;
+    while (cur_iter != end_iter)
+    {
+      tmp_node = new Node(*cur_iter);
+      copy_last->next = tmp_node;
+      tmp_node->prev = copy_last;
+      copy_last = tmp_node;
+      // move cursor node
+      ++cur_iter;
+    }
+    // insert copy list back to list
+    insert_node_list_into_list(pos_node, copy_head, copy_last);
+    // update this->_head
+    if (pos_is_head)
+      this->_head = copy_head;
+    // increase size
+    this->_size += (end - begin);
   };
   // pop
   void List::pop_back()
