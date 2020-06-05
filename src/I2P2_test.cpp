@@ -798,8 +798,8 @@ namespace I2P2_test
     std::uniform_int_distribution<> which(0, 1);
     for (unsigned long i(0); i != op_test_cnt; ++i)
     {
-      if (!(i % (op_test_cnt >> 4)))
-        std::cout << "list round: " << i / (op_test_cnt >> 4) << '\n';
+      if (!(i % (op_test_cnt >> 3)))
+        std::cout << "list round: " << i / (op_test_cnt >> 3) << '\n';
       const auto select(which(mt));
       switch (mode(mt))
       {
@@ -912,8 +912,8 @@ namespace I2P2_test
     std::uniform_int_distribution<> which(0, 1);
     for (unsigned long i(0); i != op_test_cnt; ++i)
     {
-      if (!(i % (op_test_cnt >> 4)))
-        std::cout << "vector round: " << i / (op_test_cnt >> 4) << '\n';
+      if (!(i % (op_test_cnt >> 3)))
+        std::cout << "vector round: " << i / (op_test_cnt >> 3) << '\n';
       const auto select(which(mt));
       switch (mode(mt))
       {
