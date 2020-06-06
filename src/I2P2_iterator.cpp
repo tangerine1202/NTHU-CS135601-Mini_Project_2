@@ -23,12 +23,12 @@ namespace I2P2
   };
   iterator_impl_base &vector_iterator::operator++()
   {
-    this->p += 1;
+    ++this->p;
     return *this;
   };
   iterator_impl_base &vector_iterator::operator--()
   {
-    this->p -= 1;
+    --this->p;
     return *this;
   };
   iterator_impl_base &vector_iterator::operator+=(difference_type offset)
