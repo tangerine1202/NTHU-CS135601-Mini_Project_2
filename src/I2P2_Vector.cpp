@@ -4,12 +4,6 @@
 
 namespace I2P2
 {
-
-  value_type *get_valptr_from_val_ptr(const value_type *val_ptr)
-  {
-    return const_cast<value_type *>(val_ptr);
-  }
-
   Vector::~Vector()
   {
     delete[] this->_begin;
@@ -93,18 +87,6 @@ namespace I2P2
   };
   void Vector::erase(const_iterator pos)
   {
-    // if (!this->empty())
-    // {
-    //   pointer pos_ptr = const_cast<pointer>(&*pos);
-    //   // move behind
-    //   for (; pos_ptr < this->_last; ++pos_ptr)
-    //   {
-    //     if (pos_ptr != (this->_last - 1))
-    //       *pos_ptr = *(pos_ptr + 1);
-    //   }
-    //   // delete the last node
-    //   --this->_last;
-    // }
     this->erase(pos, pos + 1);
   };
   void Vector::erase(const_iterator begin, const_iterator end)
@@ -116,11 +98,7 @@ namespace I2P2
       pointer target_ptr = const_cast<pointer>(&*begin);
       // move behind
       for (; source_ptr < this->_last; ++source_ptr, ++target_ptr)
-      {
-        // if (pos_ptr != (this->_last - 1))
-        //   *pos_ptr = *(pos_ptr + 1);
         *target_ptr = *source_ptr;
-      }
       // delete the last node
       this->_last -= diff;
     }
@@ -164,12 +142,16 @@ namespace I2P2
     }
     // Don't get pos_ptr from pos, since reserve may delete origine vector storage
     pos_ptr = this->_begin + pos_diff;
+    // construct copy_vec
+    Vector copy_vec;
+    for (const_iterator iter = begin; iter != end; ++iter)
+      copy_vec.push_back(*iter);
     // move old data
     for (pointer ptr = (this->_last + count - 1); (pos_ptr + count - 1) < ptr; --ptr)
       *(ptr) = *(ptr - count);
-    // insert new data
+    // insert copy_vec
     for (size_type i = 0; i < count; ++i)
-      *(pos_ptr + i) = *(begin + i);
+      *(pos_ptr + i) = copy_vec[i];
     // move _last
     this->_last += count;
   };
