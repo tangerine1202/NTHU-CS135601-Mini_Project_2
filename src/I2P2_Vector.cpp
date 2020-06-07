@@ -109,6 +109,7 @@ namespace I2P2
     size_type cp = this->capacity();
     size_type pos_diff = pos - this->begin();
     pointer pos_ptr;
+    value_type copy_val = val;
     // reserve if needed
     while (sz + count > cp)
     {
@@ -122,7 +123,7 @@ namespace I2P2
       *(ptr) = *(ptr - count);
     // insert new data
     for (size_type i = 0; i < count; ++i)
-      *(pos_ptr + i) = val;
+      *(pos_ptr + i) = copy_val;
     // move _last
     this->_last += count;
   };
