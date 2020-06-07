@@ -18,13 +18,13 @@ namespace I2P2
   }
 
   template <typename value_type>
-  inline void insert_node_list_into_list(Node<value_type> *pos_node, Node<value_type> *copy_head, Node<value_type> *copy_last)
+  inline void insert_node_list_into_list(Node<value_type> *pos_node, Node<value_type> *copy_front, Node<value_type> *copy_back)
   {
-    copy_head->prev = pos_node->prev;
-    copy_last->next = pos_node;
+    copy_front->prev = pos_node->prev;
+    copy_back->next = pos_node;
     if (pos_node->prev != nullptr)
-      pos_node->prev->next = copy_head;
-    pos_node->prev = copy_last;
+      pos_node->prev->next = copy_front;
+    pos_node->prev = copy_back;
   }
 
   template <typename value_type>
@@ -211,24 +211,24 @@ namespace I2P2
         return;
 
       Node<value_type> *pos_node = get_node_from_val_ptr(&*pos);
-      Node<value_type> *copy_head, *copy_last;
+      Node<value_type> *copy_front, *copy_back;
       Node<value_type> *tmp_node;
       bool pos_is_head = (pos == this->begin());
 
       // construct copy_list
-      copy_head = copy_last = new Node<value_type>(val);
+      copy_front = copy_back = new Node<value_type>(val);
       for (size_type i = 1; i < count; ++i)
       {
         tmp_node = new Node<value_type>(val);
-        copy_last->next = tmp_node;
-        tmp_node->prev = copy_last;
-        copy_last = tmp_node;
+        copy_back->next = tmp_node;
+        tmp_node->prev = copy_back;
+        copy_back = tmp_node;
       }
       // insert copy list back to list
-      insert_node_list_into_list(pos_node, copy_head, copy_last);
+      insert_node_list_into_list(pos_node, copy_front, copy_back);
       // update this->_head
       if (pos_is_head)
-        this->_head = copy_head;
+        this->_head = copy_front;
       // increase size
       this->_size += count;
     };
@@ -244,27 +244,27 @@ namespace I2P2
       // since begin, end may not be list_iterator (it may be verctor iterator)
       const_iterator cur_iter(begin);
       const_iterator end_iter(end);
-      Node<value_type> *copy_head, *copy_last;
+      Node<value_type> *copy_front, *copy_back;
       Node<value_type> *tmp_node;
       bool pos_is_head = (pos == this->begin());
 
       // consturct copy_list
-      copy_head = copy_last = new Node<value_type>(*cur_iter);
+      copy_front = copy_back = new Node<value_type>(*cur_iter);
       ++cur_iter;
       while (cur_iter != end_iter)
       {
         tmp_node = new Node<value_type>(*cur_iter);
-        copy_last->next = tmp_node;
-        tmp_node->prev = copy_last;
-        copy_last = tmp_node;
+        copy_back->next = tmp_node;
+        tmp_node->prev = copy_back;
+        copy_back = tmp_node;
         // move cursor node
         ++cur_iter;
       }
       // insert copy list back to list
-      insert_node_list_into_list(pos_node, copy_head, copy_last);
+      insert_node_list_into_list(pos_node, copy_front, copy_back);
       // update this->_head
       if (pos_is_head)
-        this->_head = copy_head;
+        this->_head = copy_front;
       // increase size
       this->_size += (end - begin);
     };

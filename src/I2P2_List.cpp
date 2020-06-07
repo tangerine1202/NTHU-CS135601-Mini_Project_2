@@ -12,13 +12,13 @@ namespace I2P2
     return ret;
   }
 
-  inline void insert_node_list_into_list(Node *pos_node, Node *copy_head, Node *copy_last)
+  inline void insert_node_list_into_list(Node *pos_node, Node *copy_front, Node *copy_back)
   {
-    copy_head->prev = pos_node->prev;
-    copy_last->next = pos_node;
+    copy_front->prev = pos_node->prev;
+    copy_back->next = pos_node;
     if (pos_node->prev != nullptr)
-      pos_node->prev->next = copy_head;
-    pos_node->prev = copy_last;
+      pos_node->prev->next = copy_front;
+    pos_node->prev = copy_back;
   }
 
   // destructor
@@ -158,24 +158,24 @@ namespace I2P2
       return;
 
     Node *pos_node = get_node_from_val_ptr(&*pos);
-    Node *copy_head, *copy_last;
+    Node *copy_front, *copy_back;
     Node *tmp_node;
     bool pos_is_head = (pos == this->begin());
 
     // construct copy_list
-    copy_head = copy_last = new Node(val);
+    copy_front = copy_back = new Node(val);
     for (size_type i = 1; i < count; ++i)
     {
       tmp_node = new Node(val);
-      copy_last->next = tmp_node;
-      tmp_node->prev = copy_last;
-      copy_last = tmp_node;
+      copy_back->next = tmp_node;
+      tmp_node->prev = copy_back;
+      copy_back = tmp_node;
     }
     // insert copy list back to list
-    insert_node_list_into_list(pos_node, copy_head, copy_last);
+    insert_node_list_into_list(pos_node, copy_front, copy_back);
     // update this->_head
     if (pos_is_head)
-      this->_head = copy_head;
+      this->_head = copy_front;
     // increase size
     this->_size += count;
   };
@@ -191,27 +191,27 @@ namespace I2P2
     // since begin, end may not be list_iterator (it may be verctor iterator)
     const_iterator cur_iter(begin);
     const_iterator end_iter(end);
-    Node *copy_head, *copy_last;
+    Node *copy_front, *copy_back;
     Node *tmp_node;
     bool pos_is_head = (pos == this->begin());
 
     // consturct copy_list
-    copy_head = copy_last = new Node(*cur_iter);
+    copy_front = copy_back = new Node(*cur_iter);
     ++cur_iter;
     while (cur_iter != end_iter)
     {
       tmp_node = new Node(*cur_iter);
-      copy_last->next = tmp_node;
-      tmp_node->prev = copy_last;
-      copy_last = tmp_node;
+      copy_back->next = tmp_node;
+      tmp_node->prev = copy_back;
+      copy_back = tmp_node;
       // move cursor node
       ++cur_iter;
     }
     // insert copy list back to list
-    insert_node_list_into_list(pos_node, copy_head, copy_last);
+    insert_node_list_into_list(pos_node, copy_front, copy_back);
     // update this->_head
     if (pos_is_head)
-      this->_head = copy_head;
+      this->_head = copy_front;
     // increase size
     this->_size += (end - begin);
   };
