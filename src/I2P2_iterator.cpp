@@ -3,12 +3,6 @@
 
 namespace I2P2
 {
-
-  // vector_iterator
-  /*
-  constructor , destructor clone: ref to 12727
-  see 11445
-  */
   vector_iterator::vector_iterator(pointer p)
   {
     this->p = p;
