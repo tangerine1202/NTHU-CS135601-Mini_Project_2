@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "cl.exe build active file",
+      "command": "cl.exe",
+      "args": [
+        "/Zi",
+        "/EHsc",
+        "/Fe:",
+        "${fileDirname}/${fileBasenameNoExtension}.exe",
+        "${file}",
+        "${fileDirname}/src/*.cpp",
+        "-DTEST_VECTOR",
+        "-DTEST_LIST",
+        "-DDOUBLE",
+        "-std=c++11"
+      ],
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "group": "build"
+    },
+    {
+      "type": "shell",
+      "label": "C/C++: cl.exe build active file",
+      "command": "cl.exe",
+      "args": [
+        "/Zi",
+        "/EHsc",
+        "/Fe:",
+        "${fileDirname}/${fileBasenameNoExtension}.exe",
+        "${file}",
+        "${fileDirname}/src/*.cpp",
+        "-DTEST_VECTOR",
+        "-DTEST_LIST",
+        "-DDOUBLE",
+        "-std=c++11"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$msCompile"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

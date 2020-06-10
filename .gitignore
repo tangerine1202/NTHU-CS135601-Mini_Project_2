@@ -3,3 +3,7 @@ a.exe
 a.out
 template/*.out
 template/*.exe
+
+*.obj
+*.ilk
+*.pdb
