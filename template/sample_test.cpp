@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <functional>
+#include <ctime>
 
 #include "header/I2P2_List.h"
 #include "header/I2P2_Vector.h"
