@@ -14,7 +14,6 @@ namespace I2P2
   };
   Vector::Vector(const Vector &rhs) : Vector()
   {
-    // reconstruct
     this->insert(this->begin(), rhs.begin(), rhs.end());
   };
   Vector &Vector::operator=(const Vector &rhs)
@@ -110,6 +109,7 @@ namespace I2P2
     size_type pos_diff = pos - this->begin();
     pointer pos_ptr;
     value_type copy_val = val;
+
     // reserve if needed
     while (sz + count > cp)
     {

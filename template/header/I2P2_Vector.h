@@ -33,8 +33,6 @@ namespace I2P2
     };
     Vector(const Vector<value_type> &rhs) : Vector()
     {
-      rhs.end();
-      rhs.begin();
       this->insert(this->begin(), rhs.begin(), rhs.end());
     };
     Vector<value_type> &operator=(const Vector<value_type> &rhs)

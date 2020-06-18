@@ -108,7 +108,6 @@ namespace I2P2
       list_iterator<value_type> ret_list_iter = list_iterator<value_type>(this->_head);
       return iterator(&ret_list_iter);
     };
-
     const_iterator begin() const
     {
       list_iterator<value_type> ret_list_iter = list_iterator<value_type>(this->_head);
@@ -139,7 +138,6 @@ namespace I2P2
     {
       return this->_tail->prev->val;
     };
-
     const value_type &back() const
     {
       return this->_tail->prev->val;
