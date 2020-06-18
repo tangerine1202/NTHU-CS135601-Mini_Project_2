@@ -42,9 +42,10 @@ namespace I2P2
     pointer p;
 
   public:
-    // (self added)
+    /// (self added) add this function to proper construct list_iterator with Node data.
     vector_iterator(pointer p);
     iterator_impl_base *clone() const;
+
     vector_iterator();
     iterator_impl_base &operator++();
     iterator_impl_base &operator--();
@@ -72,6 +73,7 @@ namespace I2P2
     // (self added) add this function to proper construct list_iterator with Node data.
     list_iterator(Node *p);
     iterator_impl_base *clone() const;
+
     list_iterator();
     iterator_impl_base &operator++();
     iterator_impl_base &operator--();
@@ -119,12 +121,12 @@ namespace I2P2
     pointer operator->() const;
     reference operator*() const;
     reference operator[](difference_type offset) const;
-    bool operator==(const const_iterator &rhs) const; // unique to const iterator
-    bool operator!=(const const_iterator &rhs) const; // unique to const iterator
-    bool operator<(const const_iterator &rhs) const;  // unique to const iterator
-    bool operator>(const const_iterator &rhs) const;  // unique to const iterator
-    bool operator<=(const const_iterator &rhs) const; // unique to const iterator
-    bool operator>=(const const_iterator &rhs) const; // unique to const iterator
+    bool operator==(const const_iterator &rhs) const;
+    bool operator!=(const const_iterator &rhs) const;
+    bool operator<(const const_iterator &rhs) const;
+    bool operator>(const const_iterator &rhs) const;
+    bool operator<=(const const_iterator &rhs) const;
+    bool operator>=(const const_iterator &rhs) const;
     /* This class holds an iterator_impl_base
    * and you may want to have some ways to 
    * invoke a container-specialized method from here

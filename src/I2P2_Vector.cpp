@@ -134,6 +134,11 @@ namespace I2P2
     size_type count = end - begin;
     size_type pos_diff = pos - this->begin();
     pointer pos_ptr;
+
+    // construct copy_vec
+    Vector copy_vec;
+    for (const_iterator iter = begin; iter != end; ++iter)
+      copy_vec.push_back(*iter);
     // reserve if needed
     while (sz + count > cp)
     {
@@ -143,10 +148,6 @@ namespace I2P2
     }
     // Don't get pos_ptr from pos, since reserve may delete origine vector storage
     pos_ptr = this->_begin + pos_diff;
-    // construct copy_vec
-    Vector copy_vec;
-    for (const_iterator iter = begin; iter != end; ++iter)
-      copy_vec.push_back(*iter);
     // move old data
     for (pointer ptr = (this->_last + count - 1); (pos_ptr + count - 1) < ptr; --ptr)
       *(ptr) = *(ptr - count);
