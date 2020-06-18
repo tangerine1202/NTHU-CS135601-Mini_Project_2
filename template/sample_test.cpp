@@ -111,5 +111,7 @@ int main()
       b.insert(b.end(), *it);
   });
 
+  std::cout << "Finish!\n";
+
   return 0;
 }
