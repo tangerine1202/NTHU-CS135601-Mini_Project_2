@@ -4,10 +4,9 @@
 #include <cstdlib>
 #include <cassert>
 #include <functional>
-#include <ctime>
 
-#include "./header/I2P2_List.h"
-#include "./header/I2P2_Vector.h"
+#include "header/I2P2_List.h"
+#include "header/I2P2_Vector.h"
 
 template <typename S, typename I>
 void test(std::function<void(S &, I &)> rng)
@@ -17,29 +16,7 @@ void test(std::function<void(S &, I &)> rng)
 
   for (int opcnt = 0; opcnt < 1 << 20; ++opcnt)
   {
-    if (!(opcnt % (1 << 17)))
-      std::cout << opcnt / (1 << 17) << '\n';
-
     int rnd = rand() % 16;
-    // std::cout << "rnd: " << rnd << "\n";
-
-    // typename I2P2::Vector<I>::iterator def_iter = def.begin();
-    // typename I::iterator iter;
-    // std::cout << "def (" << def.size() << "):\n";
-    // while (def_iter != def.end())
-    // {
-    // iter = def_iter->begin();
-    // std::cout << "(" << def_iter->size() << ") ";
-    // while (iter != def_iter->end())
-    // {
-    // std::cout << *iter << ' ';
-    // ++iter;
-    // }
-    // std::cout << '\n';
-    // ++def_iter;
-    // }
-    //std::cout << '\n';
-
     if (rnd == 0 || rnd > 7)
     { // insert random value
       S s;
@@ -125,7 +102,6 @@ int main()
     for (int i = 0; i < 10; ++i)
       b.push_back(a[i]);
   });
-
   test<std::list<double>, I2P2::List<double>>([](std::list<double> &a, I2P2::List<double> &b) {
     for (int i = 0; i < 10; ++i)
       a.insert(a.begin(), std::rand());

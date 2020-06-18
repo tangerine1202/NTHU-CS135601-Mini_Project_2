@@ -1,8 +1,9 @@
 #include <iostream>
 #include "header/I2P2_test.h"
 
-int main() {
-  
+int main()
+{
+
 #ifdef TEST_LIST
   std::cout << "Checking list ..." << std::endl;
   I2P2_test::check_list();
@@ -20,4 +21,3 @@ int main() {
 
 /* Here's how to test for both vector and list for type = double with g++:
  * g++ I2P2_main.cpp src/*.cpp -DTEST_VECTOR -DTEST_LIST -DDOUBLE -std=c++11 */
-
